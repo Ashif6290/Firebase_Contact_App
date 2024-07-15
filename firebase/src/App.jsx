@@ -4,32 +4,33 @@ import { IoMdSearch } from "react-icons/io";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { collection , getDocs } from "firebase/firestore";
 import { db } from "./config/firebase";
-import ContactCard from "./components/ContactCard";
-import Modal from "./components/Modal";
+import ContactCard from "./components/ContactCard"; 
 import AddAndUpdateContact from "./components/AddAndUpdateContact";
-
+import useDisclosure from "./hooks/useDisclosure";
+import { onSnapshot } from "firebase/firestore";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
   const [contacts , setContacts] = useState([]);
-  const [isOpen , setOpen] = useState(false);
-  const onOpen = () => {
-    setOpen(true);
-  };
-  const onClose = () => {
-    setOpen(false);
-  }
+  
+  const { isOpen , onClose , onOpen } = useDisclosure();
+
   useEffect(() => {
     const getContacts = async () => {
       try {
         const contactsRef = collection(db, "contacts");
-        const contactsSnapshot = await getDocs(contactsRef);
-        const contactLists = contactsSnapshot.docs.map((doc) => {
-          return {
-            id: doc.id,
-            ...doc.data(),
-          };
-        });
-        setContacts(contactLists);
+
+        onSnapshot(contactsRef , (snapshot) => {
+          const contactLists = snapshot.docs.map((doc) => {
+            return {
+              id: doc.id,
+              ...doc.data(),
+            };
+          });
+          setContacts(contactLists);
+          return contactLists;
+        })
       } catch (error) {
         console.log(error);
       }
@@ -54,6 +55,7 @@ const App = () => {
         </div>
       </div>
       <AddAndUpdateContact onClose={onClose} isOpen={isOpen} />
+      <ToastContainer position="bottom-center"/>
     </>
   )
 }
