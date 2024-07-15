@@ -5,6 +5,8 @@ import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import AddAndUpdateContact from "./AddAndUpdateContact";
 import useDisclosure from "../hooks/useDisclosure";
+import { toast } from "react-toastify";
+
 
 const ContactCard = ({ contact }) => {
     const { isOpen , onClose , onOpen } = useDisclosure();
